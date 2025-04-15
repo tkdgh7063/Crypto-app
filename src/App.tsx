@@ -1,20 +1,33 @@
-import styled from "styled-components";
-import Circle from "./Circle";
-
-const Container = styled.div`
-  height: 100vh;
-  width: 100vw;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
+import React, { useState } from "react";
 
 function App() {
+  const [value, setValue] = useState<string>("");
+
+  const onChange = (e: React.FormEvent<HTMLInputElement>) => {
+    const {
+      currentTarget: { value },
+    } = e;
+    setValue(value);
+  };
+
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log(value);
+  };
+
   return (
-    <Container>
-      <Circle bgColor="turquoise" borderColor="white" />
-      <Circle bgColor="tomato" text="TOMATO" />
-    </Container>
+    <div>
+      <form onSubmit={onSubmit}>
+        <input
+          value={value}
+          onChange={onChange}
+          type="text"
+          placeholder="username"
+        />
+        <button>Log in</button>
+      </form>
+      <span>Welcome {value}</span>
+    </div>
   );
 }
 
