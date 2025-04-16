@@ -55,6 +55,10 @@ body {
   background-color: ${(props) => props.theme.bgColor};
   color: ${(props) => props.theme.textColor};
 }
+h1 {
+  font-size: 2rem;
+  font-weight: 600;
+}
 a {
   text-decoration: none;
   color: inherit;
