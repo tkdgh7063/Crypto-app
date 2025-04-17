@@ -66,7 +66,7 @@ interface IInfoData {
   rank: number;
   is_new: boolean;
   is_active: boolean;
-  type: string;
+  type: "coin" | "token";
   logo: string;
   tags: ITags[];
   team: ITeam[];
