@@ -62,7 +62,7 @@ interface CoinInterface {
   rank: number;
   is_new: boolean;
   is_active: boolean;
-  typpe: string;
+  type: string;
 }
 
 function Coins() {
