@@ -1,6 +1,15 @@
 import { JSX, useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import {
+  Switch,
+  Route,
+  Link,
+  useLocation,
+  useParams,
+  useRouteMatch,
+} from "react-router-dom";
 import { styled } from "styled-components";
+import Price from "./Price";
+import Chart from "./Chart";
 
 const Container = styled.div`
   padding: 0px 20px;
@@ -100,7 +109,29 @@ const LinkWrapper = styled.div`
 
 const LinkIcon = styled.div``;
 
-const Link = styled.a``;
+const MyLink = styled.a``;
+
+const Tabs = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  margin: 25px 0px;
+  gap: 10px;
+  height: 40px;
+`;
+
+const Tab = styled.span<{ $isActive: boolean }>`
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 20px;
+  font-weight: 600;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 10px 0px;
+  border-radius: 10px;
+  a {
+    display: block;
+    color: ${(props) => (props.$isActive ? "#55efc4" : props.theme.textColor)};
+  }
+`;
 
 interface RouteParams {
   coinId: string;
@@ -218,6 +249,9 @@ function Coin() {
 
   const [info, setInfo] = useState<IInfoData>();
   const [priceInfo, setPriceInfo] = useState<IPriceData>();
+
+  const priceMatch = useRouteMatch("/:coinId/price");
+  const chartMatch = useRouteMatch("/:coinId/chart");
 
   // TODO: use Promise.all() on fetch 2 urls for efficiency
   useEffect(() => {
@@ -356,9 +390,9 @@ function Coin() {
                     <LinkWrapper key={category}>
                       <OverviewItem>{category.toUpperCase()}</OverviewItem>
                       {urls.map((url) => (
-                        <Link href={url} target="_blank">
+                        <MyLink href={url} target="_blank">
                           {category} {/* replace category with icon later */}
-                        </Link>
+                        </MyLink>
                       ))}
                     </LinkWrapper>
                   );
@@ -380,6 +414,22 @@ function Coin() {
               </OverviewItem>
             </OverviewItemWrapper>
           </Overview>
+          <Tabs>
+            <Tab $isActive={priceMatch !== null}>
+              <Link to={`/${coinId}/price`}>Price</Link>
+            </Tab>
+            <Tab $isActive={chartMatch !== null}>
+              <Link to={`/${coinId}/chart`}>Chart</Link>
+            </Tab>
+          </Tabs>
+          <Switch>
+            <Route path={`/:coinId/price`}>
+              <Price />
+            </Route>
+            <Route path={`/:coinId/chart`}>
+              <Chart />
+            </Route>
+          </Switch>
         </>
       )}
     </Container>
