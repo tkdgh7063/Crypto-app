@@ -1,4 +1,4 @@
-import { JSX, useEffect, useState } from "react";
+import { JSX } from "react";
 import {
   Switch,
   Route,
@@ -7,6 +7,7 @@ import {
   useParams,
   useRouteMatch,
 } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { styled } from "styled-components";
 import Price from "./Price";
 import Chart from "./Chart";
@@ -210,28 +211,7 @@ interface IInfoData {
   whitepaper: IWhitepaper[];
 }
 
-interface IQuote {
-  price: number;
-  volume_24h: number;
-  volume_24h_change_24h: number;
-  market_cap: number;
-  market_cap_change_24h: number;
-  percent_change_1h: number;
-  percent_change_12h: number;
-  percent_change_24h: number;
-  percent_change_7d: number;
-  percent_change_30d: number;
-  percent_change_1y: number;
-  ath_price: number;
-  ath_date: string;
-  percent_from_price_ath: number;
-}
-
-interface IQuotes {
-  [currency: string]: IQuote;
-}
-
-interface IPriceData {
+export interface IPriceData {
   id: string;
   name: string;
   symbol: string;
@@ -241,7 +221,24 @@ interface IPriceData {
   beta_value: number;
   first_data_at: string;
   last_updated: string;
-  quotes: IQuotes[];
+  quotes: {
+    USD: {
+      price: number;
+      volume_24h: number;
+      volume_24h_change_24h: number;
+      market_cap: number;
+      market_cap_change_24h: number;
+      percent_change_1h: number;
+      percent_change_12h: number;
+      percent_change_24h: number;
+      percent_change_7d: number;
+      percent_change_30d: number;
+      percent_change_1y: number;
+      ath_price: number;
+      ath_date: string;
+      percent_from_price_ath: number;
+    };
+  };
 }
 
 function Coin() {
@@ -257,14 +254,24 @@ function Coin() {
   );
   const { isLoading: tickersLoading, data: tickersData } = useQuery<IPriceData>(
     ["tickers", coinId],
-    () => coinTickersFetcher(coinId)
+    () => coinTickersFetcher(coinId),
+    {
+      refetchInterval: 10000,
+    }
   );
 
   const loading = infoLoading || tickersLoading;
   return (
     <Container>
+      <Helmet>
+        <title>
+          {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
+        </title>
+      </Helmet>
       <Header>
-        <Title>{state?.name ? state.name : "Loading..."}</Title>
+        <Title>
+          {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
+        </Title>
       </Header>
       {loading ? (
         <Loader>Loading...</Loader>
@@ -284,6 +291,10 @@ function Coin() {
               <OverviewItem>
                 <span>type</span>
                 <span>{infoData?.type.toUpperCase()}</span>
+              </OverviewItem>
+              <OverviewItem>
+                <span>price</span>
+                <span>{tickersData?.quotes.USD.price.toFixed(2)}</span>
               </OverviewItem>
             </OverviewItemWrapper>
           </Overview>
@@ -412,19 +423,19 @@ function Coin() {
             </OverviewItemWrapper>
           </Overview>
           <Tabs>
-            <Tab $isActive={priceMatch !== null}>
-              <Link to={`/${coinId}/price`}>Price</Link>
-            </Tab>
             <Tab $isActive={chartMatch !== null}>
               <Link to={`/${coinId}/chart`}>Chart</Link>
+            </Tab>
+            <Tab $isActive={priceMatch !== null}>
+              <Link to={`/${coinId}/price`}>Price</Link>
             </Tab>
           </Tabs>
           <Switch>
             <Route path={`/:coinId/price`}>
-              <Price />
+              {tickersData ? <Price data={tickersData} /> : "Loading Price..."}
             </Route>
             <Route path={`/:coinId/chart`}>
-              <Chart />
+              <Chart coinId={coinId} />
             </Route>
           </Switch>
         </>
