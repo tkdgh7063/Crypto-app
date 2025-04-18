@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import ImageCircleAi from "../assets/images/ImageCircleAi.svg";
 
 const Container = styled.div`
   padding: 0px 20px;
@@ -78,6 +79,10 @@ function Coins() {
     })();
   }, []);
 
+  const handleImgError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    e.currentTarget.src = `${ImageCircleAi}`;
+  };
+
   return (
     <Container>
       <Header>
@@ -93,6 +98,7 @@ function Coins() {
                 to={{ pathname: `/${coin.id}`, state: { name: coin.name } }}>
                 <CoinImg
                   src={`https://cryptoicon-api.pages.dev/api/icon/${coin.symbol.toLowerCase()}`}
+                  onError={handleImgError}
                 />
                 {coin.name} &rarr;
               </Link>
