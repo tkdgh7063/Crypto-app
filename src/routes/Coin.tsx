@@ -286,9 +286,7 @@ function Coin() {
         </title>
       </Helmet>
       <Header>
-        <Home onClick={() => history.push(`${process.env.PUBLIC_URL}/`)}>
-          Go Home
-        </Home>
+        <Link to={process.env.PUBLIC_URL + "/"}>Go Home</Link>
         <Title>
           {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
         </Title>
