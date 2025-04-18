@@ -10,6 +10,8 @@ import {
 import { styled } from "styled-components";
 import Price from "./Price";
 import Chart from "./Chart";
+import { coinInfoFetcher, coinTickersFetcher } from "./api";
+import { useQuery } from "react-query";
 
 const Container = styled.div`
   padding: 0px 20px;
@@ -243,33 +245,22 @@ interface IPriceData {
 }
 
 function Coin() {
-  const [loading, setLoading] = useState(true);
   const { coinId } = useParams<RouteParams>();
   const { state } = useLocation<RouteState>();
-
-  const [info, setInfo] = useState<IInfoData>();
-  const [priceInfo, setPriceInfo] = useState<IPriceData>();
 
   const priceMatch = useRouteMatch("/:coinId/price");
   const chartMatch = useRouteMatch("/:coinId/chart");
 
-  // TODO: use Promise.all() on fetch 2 urls for efficiency
-  useEffect(() => {
-    (async () => {
-      const infoData = await (
-        await fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`)
-      ).json();
+  const { isLoading: infoLoading, data: infoData } = useQuery<IInfoData>(
+    ["info", coinId],
+    () => coinInfoFetcher(coinId)
+  );
+  const { isLoading: tickersLoading, data: tickersData } = useQuery<IPriceData>(
+    ["tickers", coinId],
+    () => coinTickersFetcher(coinId)
+  );
 
-      const priceData = await (
-        await fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`)
-      ).json();
-
-      setInfo(infoData);
-      setPriceInfo(priceData);
-      setLoading(false);
-    })();
-  }, [coinId]);
-
+  const loading = infoLoading || tickersLoading;
   return (
     <Container>
       <Header>
@@ -284,25 +275,25 @@ function Coin() {
             <OverviewItemWrapper>
               <OverviewItem>
                 <span>rank</span>
-                <span>{info?.rank}</span>
+                <span>{infoData?.rank}</span>
               </OverviewItem>
               <OverviewItem>
                 <span>symbol</span>
-                <span>${info?.symbol}</span>
+                <span>${infoData?.symbol}</span>
               </OverviewItem>
               <OverviewItem>
                 <span>type</span>
-                <span>{info?.type.toUpperCase()}</span>
+                <span>{infoData?.type.toUpperCase()}</span>
               </OverviewItem>
             </OverviewItemWrapper>
           </Overview>
           <LogoContainer>
-            <Logo src={info?.logo} />
+            <Logo src={infoData?.logo} />
           </LogoContainer>
           <Description>
-            {info?.description === "" || undefined
+            {infoData?.description === "" || undefined
               ? "No Description"
-              : info?.description}
+              : infoData?.description}
           </Description>
           <Overview>
             {/* TODO: replace O, X signs to icons later */}
@@ -310,24 +301,26 @@ function Coin() {
             <OverviewItemWrapper>
               <OverviewItem>
                 <span>is_active</span>
-                <span>{info?.is_active ? "O" : "X"}</span>
+                <span>{infoData?.is_active ? "O" : "X"}</span>
               </OverviewItem>
               <OverviewItem>
                 <span>is_new</span>
-                <span>{info?.is_new ? "O" : "X"}</span>
+                <span>{infoData?.is_new ? "O" : "X"}</span>
               </OverviewItem>
               <OverviewItem>
                 <span>open_source</span>
-                <span>{info?.open_source ? "O" : "X"}</span>
+                <span>{infoData?.open_source ? "O" : "X"}</span>
               </OverviewItem>
               <OverviewItem>
                 <span>hardware_wallet</span>
-                <span>{info?.hardware_wallet ? "O" : "X"}</span>
+                <span>{infoData?.hardware_wallet ? "O" : "X"}</span>
               </OverviewItem>
               <OverviewItem>
                 <span>message</span>
                 <span>
-                  {info?.message === "" || undefined ? "None" : info?.message}
+                  {infoData?.message === "" || undefined
+                    ? "None"
+                    : infoData?.message}
                 </span>
               </OverviewItem>
             </OverviewItemWrapper>
@@ -338,23 +331,27 @@ function Coin() {
               <OverviewItem>
                 <span>development_status</span>
                 <span>
-                  {info?.development_status ? info?.development_status : "None"}
+                  {infoData?.development_status
+                    ? infoData?.development_status
+                    : "None"}
                 </span>
               </OverviewItem>
               <OverviewItem>
                 <span>proof_type</span>
-                <span>{info?.proof_type ? info?.proof_type : "None"}</span>
+                <span>
+                  {infoData?.proof_type ? infoData?.proof_type : "None"}
+                </span>
               </OverviewItem>
               <OverviewItem>
                 <span>org_structure</span>
                 <span>
-                  {info?.org_structure ? info?.org_structure : "None"}
+                  {infoData?.org_structure ? infoData?.org_structure : "None"}
                 </span>
               </OverviewItem>
               <OverviewItem>
                 <span>hash_algorithm</span>
                 <span>
-                  {info?.hash_algorithm ? info?.hash_algorithm : "None"}
+                  {infoData?.hash_algorithm ? infoData?.hash_algorithm : "None"}
                 </span>
               </OverviewItem>
             </OverviewItemWrapper>
@@ -362,7 +359,7 @@ function Coin() {
           <Overview>
             <OverviewTitle>Team Info</OverviewTitle>
             <OverviewItemWrapper>
-              {info?.team.map((t) => (
+              {infoData?.team.map((t) => (
                 <OverviewItem>{t.name}</OverviewItem>
               ))}
             </OverviewItemWrapper>
@@ -371,7 +368,7 @@ function Coin() {
             {/* TODO: align numbers in same columns to look better later */}
             <OverviewTitle>Tag Info</OverviewTitle>
             <OverviewItemWrapper>
-              {info?.tags.map((t) => (
+              {infoData?.tags.map((t) => (
                 <OverviewItemWrapper>
                   <OverviewItem>{t.name}</OverviewItem>
                   <OverviewItem>{t.coin_counter}</OverviewItem>
@@ -384,7 +381,7 @@ function Coin() {
             <OverviewTitle>Links</OverviewTitle>
             <OverviewItemWrapper>
               {linkCategories.reduce<JSX.Element[]>((acc, category) => {
-                const urls = info?.links[category];
+                const urls = infoData?.links[category];
                 if (urls && urls.length > 0) {
                   acc.push(
                     <LinkWrapper key={category}>
@@ -406,11 +403,11 @@ function Coin() {
             <OverviewItemWrapper>
               <OverviewItem>
                 <span>total supply</span>
-                <span>{priceInfo?.total_supply}</span>
+                <span>{tickersData?.total_supply}</span>
               </OverviewItem>
               <OverviewItem>
                 <span>max supply</span>
-                <span>{priceInfo?.max_supply}</span>
+                <span>{tickersData?.max_supply}</span>
               </OverviewItem>
             </OverviewItemWrapper>
           </Overview>
