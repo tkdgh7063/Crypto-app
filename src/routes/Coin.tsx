@@ -6,6 +6,7 @@ import {
   useLocation,
   useParams,
   useRouteMatch,
+  useHistory,
 } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { styled } from "styled-components";
@@ -26,13 +27,27 @@ const Container = styled.div`
 const Header = styled.header`
   height: 15vh;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
+`;
+
+const Home = styled.button`
+  background: rgba(1, 1, 1, 0);
+  border: none;
+  color: #00cec9;
+  font-size: 1rem;
+  cursor: pointer;
+  &:hover {
+    color: #55efc4;
+    background: rgba(0, 0, 0, 0.5);
+  }
 `;
 
 const Title = styled.h1`
   color: ${(props) => props.theme.accentColor};
 `;
+
+const Mode = styled.button``;
 
 const Loader = styled.div`
   display: block;
@@ -261,6 +276,8 @@ function Coin() {
   );
 
   const loading = infoLoading || tickersLoading;
+  const history = useHistory();
+
   return (
     <Container>
       <Helmet>
@@ -269,9 +286,13 @@ function Coin() {
         </title>
       </Helmet>
       <Header>
+        <Home onClick={() => history.push(`${process.env.PUBLIC_URL}/`)}>
+          Go Home
+        </Home>
         <Title>
           {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
         </Title>
+        <Mode />
       </Header>
       {loading ? (
         <Loader>Loading...</Loader>
