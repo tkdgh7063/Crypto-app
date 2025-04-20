@@ -25,15 +25,15 @@ function Price(data: PriceProps) {
     <>
       <Wrapper>
         <span>ATH Price</span>
-        <span>{`$ ${data.data.quotes.USD.ath_price}`}</span>
+        <span>{`$ ${data.data.quotes.USD.ath_price.toFixed(3)}`}</span>
       </Wrapper>
       <Wrapper>
         <span>Price</span>
-        <span>{`${data.data.quotes.USD.price.toFixed(3)}`}</span>
+        <span>{`$ ${data.data.quotes.USD.price.toFixed(3)}`}</span>
       </Wrapper>
       <Wrapper>
         <span>Percent Change 24H</span>
-        <span>{`${data.data.quotes.USD.percent_change_24h}`}</span>
+        <span>{`${data.data.quotes.USD.percent_change_24h} %`}</span>
       </Wrapper>
       <Wrapper>
         <span>Volume 24H</span>
