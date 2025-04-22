@@ -47,7 +47,7 @@ const Title = styled.h1`
   color: ${(props) => props.theme.accentColor};
 `;
 
-const Mode = styled.button``;
+const Toggle = styled.button``;
 
 const Loader = styled.div`
   display: block;
@@ -256,7 +256,12 @@ export interface IPriceData {
   };
 }
 
-function Coin() {
+interface ICoinProps {
+  isDark: boolean;
+  toggleTheme: () => void;
+}
+
+function Coin({ isDark, toggleTheme }: ICoinProps) {
   const { coinId } = useParams<RouteParams>();
   const { state } = useLocation<RouteState>();
 
@@ -290,7 +295,10 @@ function Coin() {
         <Title>
           {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
         </Title>
-        <Mode />
+        <Toggle onClick={toggleTheme}>
+          {/* {isDark ? "🌞 Light Mode" : "🌙 Dark Mode"} */}
+          Theme Toggle
+        </Toggle>
       </Header>
       {loading ? (
         <Loader>Loading...</Loader>
@@ -458,7 +466,7 @@ function Coin() {
               {tickersData ? <Price data={tickersData} /> : "Loading Price..."}
             </Route>
             <Route path={`${process.env.PUBLIC_URL}/:coinId/chart`}>
-              <Chart coinId={coinId} />
+              <Chart isDark={isDark} coinId={coinId} />
             </Route>
           </Switch>
         </>

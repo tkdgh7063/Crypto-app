@@ -22,6 +22,8 @@ const Title = styled.h1`
   color: ${(props) => props.theme.accentColor};
 `;
 
+const Toggle = styled.button``;
+
 const Loader = styled.div`
   display: block;
   text-align: center;
@@ -68,7 +70,11 @@ interface ICoin {
   type: string;
 }
 
-function Coins() {
+interface ICoinsProps {
+  toggleTheme: () => void;
+}
+
+function Coins({ toggleTheme }: ICoinsProps) {
   const { isLoading, data } = useQuery<ICoin[]>("allCoins", coinsFetcher);
 
   const handleImgError = (e: React.SyntheticEvent<HTMLImageElement>) => {
@@ -82,6 +88,10 @@ function Coins() {
       </Helmet>
       <Header>
         <Title>Coins</Title>
+        <Toggle onClick={toggleTheme}>
+          {/* {isDark ? "🌞 Light Mode" : "🌙 Dark Mode"} */}
+          Theme Toggle
+        </Toggle>
       </Header>
       {isLoading ? (
         <Loader>Loading...</Loader>

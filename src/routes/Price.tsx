@@ -37,11 +37,14 @@ function Price(data: PriceProps) {
       </Wrapper>
       <Wrapper>
         <span>Volume 24H</span>
-        <span>{`${data.data.quotes.USD.volume_24h.toFixed(3)}`}</span>
+        <span>{`${data.data.quotes.USD.volume_24h.toLocaleString(undefined, {
+          minimumFractionDigits: 3,
+          maximumFractionDigits: 3,
+        })}`}</span>
       </Wrapper>
       <Wrapper>
         <span>Market Cap</span>
-        <span>{`${data.data.quotes.USD.market_cap}`}</span>
+        <span>{`${data.data.quotes.USD.market_cap.toLocaleString()}`}</span>
       </Wrapper>
     </>
   );

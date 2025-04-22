@@ -4,6 +4,7 @@ import ApexChart from "react-apexcharts";
 
 interface ChartProps {
   coinId: string;
+  isDark: boolean;
 }
 
 interface IHistorical {
@@ -17,10 +18,17 @@ interface IHistorical {
   market_cap: number;
 }
 
-function Chart({ coinId }: ChartProps) {
+interface IError {
+  error: string;
+}
+
+function Chart({ isDark, coinId }: ChartProps) {
   const { isLoading, data } = useQuery<IHistorical[]>(["ohlcv", coinId], () =>
     coinHistoryFetcher(coinId)
   );
+
+  // TODO: return error when data is error from api
+
   return (
     <div>
       {isLoading ? (
@@ -30,6 +38,7 @@ function Chart({ coinId }: ChartProps) {
           type="candlestick"
           series={[
             {
+              // error when data returns null
               data:
                 data?.map((item) => ({
                   x: new Date(item.time_open * 1000),
@@ -50,7 +59,7 @@ function Chart({ coinId }: ChartProps) {
               background: "transparent",
             },
             theme: {
-              mode: "dark",
+              mode: isDark ? "dark" : "light",
             },
             grid: {
               show: false,
@@ -59,13 +68,6 @@ function Chart({ coinId }: ChartProps) {
               curve: "smooth",
               width: 4,
             },
-            // fill: {
-            //   type: "gradient",
-            //   gradient: {
-            //     gradientToColors: ["blue"],
-            //     stops: [0, 100],
-            //   },
-            // },
             yaxis: {
               labels: {
                 show: false,
@@ -86,6 +88,27 @@ function Chart({ coinId }: ChartProps) {
                 new Date(date.time_close * 1000).toISOString()
               ),
             },
+            plotOptions: {
+              candlestick: {
+                colors: {
+                  upward: "#eb3b5a",
+                  downward: "#3867d6",
+                },
+              },
+            },
+            noData: {
+              text: undefined,
+              align: "center",
+              verticalAlign: "middle",
+              offsetX: 0,
+              offsetY: 0,
+              style: {
+                color: undefined,
+                fontSize: "14px",
+                fontFamily: undefined,
+              },
+            },
+
             // tooltip: {
             //   custom:
             // },
