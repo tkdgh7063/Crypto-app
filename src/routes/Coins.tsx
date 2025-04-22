@@ -1,8 +1,10 @@
 import { Helmet } from "react-helmet";
 import { useQuery } from "react-query";
 import { Link } from "react-router-dom";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
 import ImageCircleAi from "../assets/images/ImageCircleAi.svg";
+import { isDarkAtom } from "../atoms";
 import { coinsFetcher } from "./api";
 
 const Container = styled.div`
@@ -70,12 +72,14 @@ interface ICoin {
   type: string;
 }
 
-interface ICoinsProps {
-  toggleTheme: () => void;
-}
+interface ICoinsProps {}
 
-function Coins({ toggleTheme }: ICoinsProps) {
+function Coins({}: ICoinsProps) {
   const { isLoading, data } = useQuery<ICoin[]>("allCoins", coinsFetcher);
+  const isDark = useRecoilValue(isDarkAtom);
+  const setDarkAtom = useSetRecoilState(isDarkAtom);
+
+  const toggleTheme = () => setDarkAtom((prev) => !prev);
 
   const handleImgError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     e.currentTarget.src = `${ImageCircleAi}`;
@@ -89,8 +93,7 @@ function Coins({ toggleTheme }: ICoinsProps) {
       <Header>
         <Title>Coins</Title>
         <Toggle onClick={toggleTheme}>
-          {/* {isDark ? "🌞 Light Mode" : "🌙 Dark Mode"} */}
-          Theme Toggle
+          {isDark ? "🌞Light Mode" : "🌙Dark Mode"}
         </Toggle>
       </Header>
       {isLoading ? (

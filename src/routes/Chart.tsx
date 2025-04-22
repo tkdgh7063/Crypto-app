@@ -1,10 +1,11 @@
 import { useQuery } from "react-query";
 import { coinHistoryFetcher } from "./api";
 import ApexChart from "react-apexcharts";
+import { isDarkAtom } from "../atoms";
+import { useRecoilValue } from "recoil";
 
 interface ChartProps {
   coinId: string;
-  isDark: boolean;
 }
 
 interface IHistorical {
@@ -22,10 +23,12 @@ interface IError {
   error: string;
 }
 
-function Chart({ isDark, coinId }: ChartProps) {
+function Chart({ coinId }: ChartProps) {
   const { isLoading, data } = useQuery<IHistorical[]>(["ohlcv", coinId], () =>
     coinHistoryFetcher(coinId)
   );
+
+  const isDark = useRecoilValue(isDarkAtom);
 
   // TODO: return error when data is error from api
 
