@@ -1,4 +1,4 @@
-import { JSX } from "react";
+import React, { JSX } from "react";
 import {
   Switch,
   Route,
@@ -16,6 +16,16 @@ import { coinInfoFetcher, coinTickersFetcher } from "./api";
 import { useQuery } from "react-query";
 import { isDarkAtom } from "../atoms";
 import { useRecoilValue, useSetRecoilState } from "recoil";
+import { IconType } from "react-icons/lib/iconBase";
+import {
+  FaReddit,
+  FaFacebook,
+  FaInternetExplorer,
+  FaGithub,
+  FaGlobe,
+  FaYoutube,
+  FaBlog,
+} from "react-icons/fa";
 
 const Container = styled.div`
   padding: 0px 20px;
@@ -127,6 +137,10 @@ const LinkWrapper = styled.div`
   }
 `;
 
+type iconProps = {
+  category: LinkCategory;
+};
+
 const LinkIcon = styled.div``;
 
 const MyLink = styled.a``;
@@ -173,7 +187,7 @@ interface ITeam {
   position: string;
 }
 
-const linkCategories = [
+const linkCategories: LinkCategory[] = [
   "explorer",
   "facebook",
   "reddit",
@@ -181,11 +195,28 @@ const linkCategories = [
   "website",
   "youtube",
   "medium",
-] as const;
+];
+
+type LinkCategory =
+  | "explorer"
+  | "facebook"
+  | "reddit"
+  | "source_code"
+  | "website"
+  | "youtube"
+  | "medium";
 
 // TODO: add link icons for each categories
 // [github, explorer(magnify), website(global | home)]
-const linkIcons = [""] as const;
+const linkIcons: Record<LinkCategory, IconType> = {
+  explorer: FaInternetExplorer,
+  facebook: FaFacebook,
+  reddit: FaReddit,
+  source_code: FaGithub,
+  website: FaGlobe,
+  youtube: FaYoutube,
+  medium: FaBlog,
+};
 
 interface ILinks {
   explorer?: string[] | null;
@@ -295,7 +326,9 @@ function Coin({}: ICoinProps) {
         </title>
       </Helmet>
       <Header>
-        <Link to={process.env.PUBLIC_URL + "/"}>Go Home</Link>
+        <Link to={process.env.PUBLIC_URL + "/"}>
+          <Home>Go to Home</Home>
+        </Link>
         <Title>
           {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
         </Title>
@@ -412,8 +445,10 @@ function Coin({}: ICoinProps) {
               {infoData?.tags.map((t) => (
                 <OverviewItemWrapper>
                   <OverviewItem>{t.name}</OverviewItem>
-                  <OverviewItem>{t.coin_counter}</OverviewItem>
-                  <OverviewItem>{t.ico_counter}</OverviewItem>
+                  <div>
+                    <OverviewItem>{t.coin_counter}</OverviewItem>
+                    <OverviewItem>{t.ico_counter}</OverviewItem>
+                  </div>
                 </OverviewItemWrapper>
               ))}
             </OverviewItemWrapper>
@@ -423,13 +458,14 @@ function Coin({}: ICoinProps) {
             <OverviewItemWrapper>
               {linkCategories.reduce<JSX.Element[]>((acc, category) => {
                 const urls = infoData?.links[category];
+                const IconComponent = linkIcons[category];
                 if (urls && urls.length > 0) {
                   acc.push(
                     <LinkWrapper key={category}>
                       <OverviewItem>{category.toUpperCase()}</OverviewItem>
                       {urls.map((url) => (
-                        <MyLink href={url} target="_blank">
-                          {category} {/* replace category with icon later */}
+                        <MyLink href={url} target="_blank" key={url}>
+                          <IconComponent />
                         </MyLink>
                       ))}
                     </LinkWrapper>
