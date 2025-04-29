@@ -15,16 +15,23 @@ const Container = styled.div`
 
 const Header = styled.header`
   height: 10vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  position: relative;
 `;
 
 const Title = styled.h1`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   color: ${(props) => props.theme.accentColor};
 `;
 
-const Toggle = styled.button``;
+const Toggle = styled.button`
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+`;
 
 const Loader = styled.div`
   display: block;

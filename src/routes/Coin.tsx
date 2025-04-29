@@ -480,11 +480,11 @@ function Coin({}: ICoinProps) {
             <OverviewItemWrapper>
               <OverviewItem>
                 <span>total supply</span>
-                <span>{tickersData?.total_supply}</span>
+                <span>{tickersData?.total_supply.toLocaleString()}</span>
               </OverviewItem>
               <OverviewItem>
                 <span>max supply</span>
-                <span>{tickersData?.max_supply}</span>
+                <span>{tickersData?.max_supply.toLocaleString()}</span>
               </OverviewItem>
             </OverviewItemWrapper>
           </Overview>
