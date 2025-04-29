@@ -1,11 +1,11 @@
 {
   "files": {
-    "main.js": "/Movie-app/static/js/main.d26bdc91.js",
+    "main.js": "/Movie-app/static/js/main.092f3da1.js",
     "static/media/ImageCircleAi.svg": "/Movie-app/static/media/ImageCircleAi.2c35464ddefa0d111a2b8388fc3e6975.svg",
     "index.html": "/Movie-app/index.html",
-    "main.d26bdc91.js.map": "/Movie-app/static/js/main.d26bdc91.js.map"
+    "main.092f3da1.js.map": "/Movie-app/static/js/main.092f3da1.js.map"
   },
   "entrypoints": [
-    "static/js/main.d26bdc91.js"
+    "static/js/main.092f3da1.js"
   ]
 }
