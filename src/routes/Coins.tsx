@@ -115,7 +115,7 @@ function Coins({}: ICoinsProps) {
                   state: { name: coin.name },
                 }}>
                 <CoinImg
-                  src={`https://cryptoicon-api.pages.dev/api/icon/${coin.symbol.toLowerCase()}`}
+                  src={`https://static.coinpaprika.com/coin/${coin.id}/logo.png`}
                   onError={handleImgError}
                 />
                 {coin.name} &rarr;
