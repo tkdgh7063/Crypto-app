@@ -117,6 +117,24 @@ const Description = styled.p`
   line-height: 1.8;
 `;
 
+const TagItemWrapper = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 60px 60px;
+  column-gap: 12px;
+  row-gap: 8px;
+  align-items: center;
+  width: 100%;
+`;
+
+const TagName = styled.div`
+  font-weight: 600;
+`;
+
+const TagItem = styled.div`
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+`;
+
 const LogoContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -441,17 +459,15 @@ function Coin({}: ICoinProps) {
           <Overview>
             {/* TODO: align numbers in same columns to look better later */}
             <OverviewTitle>Tag Info</OverviewTitle>
-            <OverviewItemWrapper>
+            <TagItemWrapper>
               {infoData?.tags.map((t) => (
-                <OverviewItemWrapper>
-                  <OverviewItem>{t.name}</OverviewItem>
-                  <div>
-                    <OverviewItem>{t.coin_counter}</OverviewItem>
-                    <OverviewItem>{t.ico_counter}</OverviewItem>
-                  </div>
-                </OverviewItemWrapper>
+                <>
+                  <TagName>{t.name}</TagName>
+                  <TagItem>{t.coin_counter}</TagItem>
+                  <TagItem>{t.ico_counter}</TagItem>
+                </>
               ))}
-            </OverviewItemWrapper>
+            </TagItemWrapper>
           </Overview>
           <Overview>
             <OverviewTitle>Links</OverviewTitle>
