@@ -395,7 +395,6 @@ function Coin() {
             </OverviewItemWrapper>
           </Overview>
           <Overview>
-            {/* TODO: align numbers in same columns to look better later */}
             <OverviewTitle>Tag Info</OverviewTitle>
             <TagItemWrapper>
               {info?.tags.map((t) => (
@@ -408,6 +407,7 @@ function Coin() {
             </TagItemWrapper>
           </Overview>
           <Overview>
+            {/* align logo links in grid if possible to look better */}
             <OverviewTitle>Links</OverviewTitle>
             <OverviewItemWrapper>
               {linkCategories.reduce<JSX.Element[]>((acc, category) => {
@@ -430,7 +430,6 @@ function Coin() {
             </OverviewItemWrapper>
           </Overview>
           <Overview>
-            {/* TODO: Whitepaper UI fixes */}
             <OverviewTitle>Whitepaper</OverviewTitle>
             <OverviewItemWrapper>
               <Whitepaper>
