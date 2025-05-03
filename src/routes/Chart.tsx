@@ -3,25 +3,28 @@ import { coinHistoryFetcher } from "./api";
 import ApexChart from "react-apexcharts";
 import { isDarkAtom } from "../atoms";
 import { useRecoilValue } from "recoil";
-import { IHistorical } from "../api";
+import { IHistorical, IError } from "../api";
 
 interface ChartProps {
   coinId: string;
 }
 
-interface IError {
-  error: string;
-}
-
 function Chart({ coinId }: ChartProps) {
-  const { isLoading, data } = useQuery<IHistorical[]>(["ohlcv", coinId], () =>
-    coinHistoryFetcher(coinId)
+  const { isLoading, data } = useQuery<IHistorical[] | IError>(
+    ["ohlcv", coinId],
+    () => coinHistoryFetcher(coinId)
   );
 
   const isDark = useRecoilValue(isDarkAtom);
 
   // TODO: return error when data is error from api
+  if (!isLoading && data) {
+    if ("error" in data) {
+      return <div>ERROR!!</div>;
+    }
+  }
 
+  const chartData = data as IHistorical[];
   return (
     <div>
       {isLoading ? (
@@ -31,9 +34,8 @@ function Chart({ coinId }: ChartProps) {
           type="candlestick"
           series={[
             {
-              // error when data returns null
               data:
-                data?.map((item) => ({
+                chartData?.map((item) => ({
                   x: new Date(item.time_open * 1000),
                   y: [
                     parseFloat(item.open),
@@ -77,7 +79,7 @@ function Chart({ coinId }: ChartProps) {
                 show: false,
               },
               type: "datetime",
-              categories: data?.map((date) =>
+              categories: chartData?.map((date) =>
                 new Date(date.time_close * 1000).toISOString()
               ),
             },

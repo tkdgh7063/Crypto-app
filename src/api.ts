@@ -110,3 +110,7 @@ export interface IHistorical {
   volume: string;
   market_cap: number;
 }
+
+export interface IError {
+  error: string;
+}

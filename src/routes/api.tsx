@@ -1,4 +1,11 @@
-import { ICoin, IErrorProps, IHistorical, IInfoData, IPriceData } from "../api";
+import {
+  ICoin,
+  IErrorProps,
+  IHistorical,
+  IInfoData,
+  IPriceData,
+  IError,
+} from "../api";
 
 const BASE_URL = `https://api.coinpaprika.com/v1`;
 
@@ -20,7 +27,9 @@ export function coinTickersFetcher(coinId: string): Promise<IPriceData> {
   return fetch(`${BASE_URL}/tickers/${coinId}`).then((r) => r.json());
 }
 
-export function coinHistoryFetcher(coinId: string): Promise<IHistorical[]> {
+export function coinHistoryFetcher(
+  coinId: string
+): Promise<IHistorical[] | IError> {
   return fetch(
     `https://ohlcv-api.nomadcoders.workers.dev/?coinId=${coinId}`
   ).then((r) => r.json());
