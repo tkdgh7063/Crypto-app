@@ -1,4 +1,4 @@
-import React, { JSX } from "react";
+import { JSX } from "react";
 import {
   Switch,
   Route,
@@ -26,6 +26,7 @@ import {
   FaYoutube,
   FaBlog,
 } from "react-icons/fa";
+import { IErrorProps, IInfoData, IPriceData } from "../api";
 
 const Container = styled.div`
   padding: 0px 20px;
@@ -122,18 +123,32 @@ const TagItemWrapper = styled.div`
   grid-template-columns: 1fr 60px 60px;
   column-gap: 12px;
   row-gap: 8px;
-  align-items: center;
   width: 100%;
 `;
 
 const TagName = styled.div`
   font-weight: 600;
+  text-align: center;
+  padding-right: 12.5%;
+  color: white;
 `;
 
 const TagItem = styled.div`
   text-align: right;
-  font-variant-numeric: tabular-nums;
+  /* font-variant-numeric: tabular-nums; */
 `;
+
+const Whitepaper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+`;
+
+const WpLink = styled.a``;
+
+const WpThumb = styled.img``;
 
 const LogoContainer = styled.div`
   display: flex;
@@ -193,18 +208,6 @@ interface RouteState {
   name: string;
 }
 
-interface ITags {
-  coin_counter: number;
-  ico_counter: number;
-  id: string;
-  name: string;
-}
-interface ITeam {
-  id: string;
-  name: string;
-  position: string;
-}
-
 const linkCategories: LinkCategory[] = [
   "explorer",
   "facebook",
@@ -224,7 +227,6 @@ type LinkCategory =
   | "youtube"
   | "medium";
 
-// TODO: add link icons for each categories
 // [github, explorer(magnify), website(global | home)]
 const linkIcons: Record<LinkCategory, IconType> = {
   explorer: FaInternetExplorer,
@@ -236,90 +238,18 @@ const linkIcons: Record<LinkCategory, IconType> = {
   medium: FaBlog,
 };
 
-interface ILinks {
-  explorer?: string[] | null;
-  facebook?: string[] | null;
-  reddit?: string[] | null;
-  source_code?: string[] | null;
-  website?: string[] | null;
-  youtube?: string[] | null;
-  medium?: string[] | null;
-}
+const Error = styled.div``;
 
-interface IWhitepaper {
-  link: string;
-  thumbnail: string;
-}
-
-interface IInfoData {
-  id: string;
-  name: string;
-  symbol: string;
-  rank: number;
-  is_new: boolean;
-  is_active: boolean;
-  type: "coin" | "token";
-  logo: string;
-  tags: ITags[];
-  team: ITeam[];
-  description: string;
-  message: string;
-  open_source: boolean;
-  started_at: string;
-  development_status: string;
-  hardware_wallet: boolean;
-  proof_type?: string | null;
-  org_structure?: string | null;
-  hash_algorithm?: string | null;
-  first_data_at: string;
-  last_data_at: string;
-  links: ILinks;
-  whitepaper: IWhitepaper[];
-}
-
-export interface IPriceData {
-  id: string;
-  name: string;
-  symbol: string;
-  rank: number;
-  total_supply: number;
-  max_supply: number;
-  beta_value: number;
-  first_data_at: string;
-  last_updated: string;
-  quotes: {
-    USD: {
-      price: number;
-      volume_24h: number;
-      volume_24h_change_24h: number;
-      market_cap: number;
-      market_cap_change_24h: number;
-      percent_change_1h: number;
-      percent_change_12h: number;
-      percent_change_24h: number;
-      percent_change_7d: number;
-      percent_change_30d: number;
-      percent_change_1y: number;
-      ath_price: number;
-      ath_date: string;
-      percent_from_price_ath: number;
-    };
-  };
-}
-
-interface ICoinProps {}
-
-function Coin({}: ICoinProps) {
+function Coin() {
   const { coinId } = useParams<RouteParams>();
   const { state } = useLocation<RouteState>();
 
   const priceMatch = useRouteMatch("/:coinId/price");
   const chartMatch = useRouteMatch("/:coinId/chart");
 
-  const { isLoading: infoLoading, data: infoData } = useQuery<IInfoData>(
-    ["info", coinId],
-    () => coinInfoFetcher(coinId)
-  );
+  const { isLoading: infoLoading, data: infoData } = useQuery<
+    IInfoData | IErrorProps
+  >(["info", coinId], () => coinInfoFetcher(coinId));
   const { isLoading: tickersLoading, data: tickersData } = useQuery<IPriceData>(
     ["tickers", coinId],
     () => coinTickersFetcher(coinId),
@@ -336,11 +266,25 @@ function Coin({}: ICoinProps) {
   const loading = infoLoading || tickersLoading;
   const history = useHistory();
 
+  if (!loading && infoData && tickersData) {
+    if ("error" in infoData || "error" in tickersData) {
+      const errorData = infoData as IErrorProps;
+      return (
+        <Container>
+          <Error>{errorData?.type}</Error>
+          <Description>Try again after {errorData?.block_duration}</Description>
+        </Container>
+      );
+    }
+  }
+
+  const info = infoData as IInfoData;
+  const price = tickersData as IPriceData;
   return (
     <Container>
       <Helmet>
         <title>
-          {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
+          {state?.name ? state.name : loading ? "Loading..." : info?.name}
         </title>
       </Helmet>
       <Header>
@@ -348,7 +292,7 @@ function Coin({}: ICoinProps) {
           <Home>Go to Home</Home>
         </Link>
         <Title>
-          {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
+          {state?.name ? state.name : loading ? "Loading..." : info?.name}
         </Title>
         <Toggle onClick={toggleTheme}>
           {isDark ? "🌞Light Mode" : "🌙Dark Mode"}
@@ -363,29 +307,29 @@ function Coin({}: ICoinProps) {
             <OverviewItemWrapper>
               <OverviewItem>
                 <span>rank</span>
-                <span>{infoData?.rank}</span>
+                <span>{info?.rank}</span>
               </OverviewItem>
               <OverviewItem>
                 <span>symbol</span>
-                <span>${infoData?.symbol}</span>
+                <span>${info?.symbol}</span>
               </OverviewItem>
               <OverviewItem>
                 <span>type</span>
-                <span>{infoData?.type.toUpperCase()}</span>
+                <span>{info?.type.toUpperCase()}</span>
               </OverviewItem>
               <OverviewItem>
                 <span>price</span>
-                <span>{`$ ${tickersData?.quotes.USD.price.toFixed(3)}`}</span>
+                <span>{`$ ${price?.quotes.USD.price.toFixed(3)}`}</span>
               </OverviewItem>
             </OverviewItemWrapper>
           </Overview>
           <LogoContainer>
-            <Logo src={infoData?.logo} />
+            <Logo src={info?.logo} />
           </LogoContainer>
           <Description>
-            {infoData?.description === "" || undefined
+            {info?.description === "" || undefined
               ? "No Description"
-              : infoData?.description}
+              : info?.description}
           </Description>
           <Overview>
             {/* TODO: replace O, X signs to icons later */}
@@ -393,26 +337,24 @@ function Coin({}: ICoinProps) {
             <OverviewItemWrapper>
               <OverviewItem>
                 <span>is_active</span>
-                <span>{infoData?.is_active ? "O" : "X"}</span>
+                <span>{info?.is_active ? "O" : "X"}</span>
               </OverviewItem>
               <OverviewItem>
                 <span>is_new</span>
-                <span>{infoData?.is_new ? "O" : "X"}</span>
+                <span>{info?.is_new ? "O" : "X"}</span>
               </OverviewItem>
               <OverviewItem>
                 <span>open_source</span>
-                <span>{infoData?.open_source ? "O" : "X"}</span>
+                <span>{info?.open_source ? "O" : "X"}</span>
               </OverviewItem>
               <OverviewItem>
                 <span>hardware_wallet</span>
-                <span>{infoData?.hardware_wallet ? "O" : "X"}</span>
+                <span>{info?.hardware_wallet ? "O" : "X"}</span>
               </OverviewItem>
               <OverviewItem>
                 <span>message</span>
                 <span>
-                  {infoData?.message === "" || undefined
-                    ? "None"
-                    : infoData?.message}
+                  {info?.message === "" || undefined ? "None" : info?.message}
                 </span>
               </OverviewItem>
             </OverviewItemWrapper>
@@ -423,27 +365,23 @@ function Coin({}: ICoinProps) {
               <OverviewItem>
                 <span>development_status</span>
                 <span>
-                  {infoData?.development_status
-                    ? infoData?.development_status
-                    : "None"}
+                  {info?.development_status ? info?.development_status : "None"}
                 </span>
               </OverviewItem>
               <OverviewItem>
                 <span>proof_type</span>
-                <span>
-                  {infoData?.proof_type ? infoData?.proof_type : "None"}
-                </span>
+                <span>{info?.proof_type ? info?.proof_type : "None"}</span>
               </OverviewItem>
               <OverviewItem>
                 <span>org_structure</span>
                 <span>
-                  {infoData?.org_structure ? infoData?.org_structure : "None"}
+                  {info?.org_structure ? info?.org_structure : "None"}
                 </span>
               </OverviewItem>
               <OverviewItem>
                 <span>hash_algorithm</span>
                 <span>
-                  {infoData?.hash_algorithm ? infoData?.hash_algorithm : "None"}
+                  {info?.hash_algorithm ? info?.hash_algorithm : "None"}
                 </span>
               </OverviewItem>
             </OverviewItemWrapper>
@@ -451,7 +389,7 @@ function Coin({}: ICoinProps) {
           <Overview>
             <OverviewTitle>Team Info</OverviewTitle>
             <OverviewItemWrapper>
-              {infoData?.team.map((t) => (
+              {info?.team.map((t) => (
                 <OverviewItem>{t.name}</OverviewItem>
               ))}
             </OverviewItemWrapper>
@@ -460,7 +398,7 @@ function Coin({}: ICoinProps) {
             {/* TODO: align numbers in same columns to look better later */}
             <OverviewTitle>Tag Info</OverviewTitle>
             <TagItemWrapper>
-              {infoData?.tags.map((t) => (
+              {info?.tags.map((t) => (
                 <>
                   <TagName>{t.name}</TagName>
                   <TagItem>{t.coin_counter}</TagItem>
@@ -473,7 +411,7 @@ function Coin({}: ICoinProps) {
             <OverviewTitle>Links</OverviewTitle>
             <OverviewItemWrapper>
               {linkCategories.reduce<JSX.Element[]>((acc, category) => {
-                const urls = infoData?.links[category];
+                const urls = info?.links[category];
                 const IconComponent = linkIcons[category];
                 if (urls && urls.length > 0) {
                   acc.push(
@@ -492,15 +430,26 @@ function Coin({}: ICoinProps) {
             </OverviewItemWrapper>
           </Overview>
           <Overview>
+            {/* TODO: Whitepaper UI fixes */}
+            <OverviewTitle>Whitepaper</OverviewTitle>
+            <OverviewItemWrapper>
+              <Whitepaper>
+                <WpLink href={info?.whitepaper.link}>
+                  <WpThumb src={info?.whitepaper.thumbnail} />
+                </WpLink>
+              </Whitepaper>
+            </OverviewItemWrapper>
+          </Overview>
+          <Overview>
             <OverviewTitle>Ticker</OverviewTitle>
             <OverviewItemWrapper>
               <OverviewItem>
                 <span>total supply</span>
-                <span>{tickersData?.total_supply.toLocaleString()}</span>
+                <span>{price?.total_supply.toLocaleString()}</span>
               </OverviewItem>
               <OverviewItem>
                 <span>max supply</span>
-                <span>{tickersData?.max_supply.toLocaleString()}</span>
+                <span>{price?.max_supply.toLocaleString()}</span>
               </OverviewItem>
             </OverviewItemWrapper>
           </Overview>
@@ -518,7 +467,7 @@ function Coin({}: ICoinProps) {
           </Tabs>
           <Switch>
             <Route path={`${process.env.PUBLIC_URL}/:coinId/price`}>
-              {tickersData ? <Price data={tickersData} /> : "Loading Price..."}
+              {price ? <Price data={price} /> : "Loading Price..."}
             </Route>
             <Route path={`${process.env.PUBLIC_URL}/:coinId/chart`}>
               <Chart coinId={coinId} />

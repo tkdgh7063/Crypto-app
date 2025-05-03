@@ -3,6 +3,7 @@ import { useQuery } from "react-query";
 import { Link } from "react-router-dom";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
+import { ICoin, IErrorProps } from "../api";
 import ImageCircleAi from "../assets/images/ImageCircleAi.svg";
 import { isDarkAtom } from "../atoms";
 import { coinsFetcher } from "./api";
@@ -12,6 +13,10 @@ const Container = styled.div`
   max-width: 480px;
   margin: 0 auto;
 `;
+
+const Error = styled.div``;
+
+const Description = styled.div``;
 
 const Header = styled.header`
   height: 10vh;
@@ -69,20 +74,13 @@ const Coin = styled.li`
   }
 `;
 
-interface ICoin {
-  id: string;
-  name: string;
-  symbol: string;
-  rank: number;
-  is_new: boolean;
-  is_active: boolean;
-  type: string;
-}
-
 interface ICoinsProps {}
 
 function Coins({}: ICoinsProps) {
-  const { isLoading, data } = useQuery<ICoin[]>("allCoins", coinsFetcher);
+  const { isLoading, data } = useQuery<ICoin[] | IErrorProps>(
+    "allCoins",
+    coinsFetcher
+  );
   const isDark = useRecoilValue(isDarkAtom);
   const setDarkAtom = useSetRecoilState(isDarkAtom);
 
@@ -92,6 +90,20 @@ function Coins({}: ICoinsProps) {
     e.currentTarget.src = `${ImageCircleAi}`;
   };
 
+  if (!isLoading && data) {
+    // Error Return
+    if ("error" in data) {
+      const errorData = data as IErrorProps;
+      return (
+        <Container>
+          <Error>{errorData?.type}</Error>
+          <Description>Try again after {errorData?.block_duration}</Description>
+        </Container>
+      );
+    }
+  }
+
+  const coinData = data as ICoin[];
   return (
     <Container>
       <Helmet>
@@ -107,7 +119,7 @@ function Coins({}: ICoinsProps) {
         <Loader>Loading...</Loader>
       ) : (
         <CoinsList>
-          {data?.slice(0, 100).map((coin) => (
+          {coinData?.slice(0, 100).map((coin) => (
             <Coin key={coin.id}>
               <Link
                 to={{

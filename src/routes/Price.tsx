@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { IPriceData } from "./Coin";
+import { IPriceData } from "../api";
 
 const Wrapper = styled.div`
   display: flex;
