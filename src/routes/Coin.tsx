@@ -433,7 +433,7 @@ function Coin() {
             <OverviewTitle>Whitepaper</OverviewTitle>
             <OverviewItemWrapper>
               <Whitepaper>
-                <WpLink href={info?.whitepaper.link}>
+                <WpLink href={info?.whitepaper.link} target="_blank">
                   <WpThumb src={info?.whitepaper.thumbnail} />
                 </WpLink>
               </Whitepaper>
