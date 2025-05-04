@@ -11,8 +11,15 @@ import {
 const BASE_URL = `https://api.coinpaprika.com/v1`;
 
 export function coinsFetcher(): Promise<ICoin[] | IError> {
-  return fetch(`${BASE_URL}/coins`)
+  return fetch(`${BASE_URL}/coins`, {
+    method: "GET",
+    mode: "no-cors",
+    headers: { "Content-Type": "application-json" },
+  })
     .then((r) => {
+      if (r.status === 0) {
+        return { error: "API Error" };
+      }
       return r.json();
     })
     .catch((e) => {
@@ -21,8 +28,15 @@ export function coinsFetcher(): Promise<ICoin[] | IError> {
 }
 
 export function coinInfoFetcher(coinId: String): Promise<IInfoData | IError> {
-  return fetch(`${BASE_URL}/coins/${coinId}`)
+  return fetch(`${BASE_URL}/coins/${coinId}`, {
+    method: "GET",
+    mode: "no-cors",
+    headers: { "Content-Type": "application-json" },
+  })
     .then((r) => {
+      if (r.status === 0) {
+        return { error: "API Error" };
+      }
       return r.json();
     })
     .catch((e) => {
@@ -30,8 +44,23 @@ export function coinInfoFetcher(coinId: String): Promise<IInfoData | IError> {
     });
 }
 
-export function coinTickersFetcher(coinId: string): Promise<IPriceData> {
-  return fetch(`${BASE_URL}/tickers/${coinId}`).then((r) => r.json());
+export function coinTickersFetcher(
+  coinId: string
+): Promise<IPriceData | IError> {
+  return fetch(`${BASE_URL}/tickers/${coinId}`, {
+    method: "GET",
+    mode: "no-cors",
+    headers: { "Content-Type": "application-json" },
+  })
+    .then((r) => {
+      if (r.status === 0) {
+        return { error: "API Error" };
+      }
+      return r.json();
+    })
+    .catch((e) => {
+      return { error: "API Error" };
+    });
 }
 
 export function coinHistoryFetcher(

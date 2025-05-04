@@ -252,18 +252,16 @@ function Coin() {
   const { isLoading: infoLoading, data: infoData } = useQuery<
     IInfoData | IError
   >(["info", coinId], () => coinInfoFetcher(coinId));
-  const { isLoading: tickersLoading, data: tickersData } = useQuery<IPriceData>(
-    ["tickers", coinId],
-    () => coinTickersFetcher(coinId),
-    {
-      refetchInterval: (data) => {
-        if (data && "error" in data) {
-          return false;
-        }
-        return 10000;
-      },
-    }
-  );
+  const { isLoading: tickersLoading, data: tickersData } = useQuery<
+    IPriceData | IError
+  >(["tickers", coinId], () => coinTickersFetcher(coinId), {
+    refetchInterval: (data) => {
+      if (data && "error" in data) {
+        return false;
+      }
+      return 10000;
+    },
+  });
 
   const isDark = useRecoilValue(isDarkAtom);
   const setDarkAtom = useSetRecoilState(isDarkAtom);
@@ -273,8 +271,9 @@ function Coin() {
   const loading = infoLoading || tickersLoading;
   const history = useHistory();
 
-  if (loading && infoData) {
-    if ("error" in infoData) {
+  if ((loading && infoData) || tickersData) {
+    const ID = infoData as IError | IInfoData;
+    if ("error" in ID) {
       const errorData = infoData as IError;
       return (
         <Container>
