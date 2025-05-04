@@ -4,9 +4,20 @@ import ApexChart from "react-apexcharts";
 import { isDarkAtom } from "../atoms";
 import { useRecoilValue } from "recoil";
 import { IHistorical, IError } from "../api";
+import { styled } from "styled-components";
 
 interface ChartProps {
   coinId: string;
+}
+
+const ErrorContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+function isError(data: IHistorical[] | IError): data is IError {
+  return "error" in data;
 }
 
 function Chart({ coinId }: ChartProps) {
@@ -19,8 +30,12 @@ function Chart({ coinId }: ChartProps) {
 
   // TODO: return error when data is error from api
   if (!isLoading && data) {
-    if ("error" in data) {
-      return <div>ERROR!!</div>;
+    if (isError(data)) {
+      return (
+        <ErrorContainer>
+          <span>No Chart Info to Display!</span>
+        </ErrorContainer>
+      );
     }
   }
 
@@ -34,16 +49,15 @@ function Chart({ coinId }: ChartProps) {
           type="candlestick"
           series={[
             {
-              data:
-                chartData?.map((item) => ({
-                  x: new Date(item.time_open * 1000),
-                  y: [
-                    parseFloat(item.open),
-                    parseFloat(item.high),
-                    parseFloat(item.low),
-                    parseFloat(item.close),
-                  ],
-                })) ?? [],
+              data: chartData?.map((item) => ({
+                x: new Date(item.time_open * 1000),
+                y: [
+                  parseFloat(item.open),
+                  parseFloat(item.high),
+                  parseFloat(item.low),
+                  parseFloat(item.close),
+                ],
+              })),
             },
           ]}
           options={{
@@ -91,22 +105,9 @@ function Chart({ coinId }: ChartProps) {
                 },
               },
             },
-            noData: {
-              text: undefined,
-              align: "center",
-              verticalAlign: "middle",
-              offsetX: 0,
-              offsetY: 0,
-              style: {
-                color: undefined,
-                fontSize: "14px",
-                fontFamily: undefined,
-              },
+            tooltip: {
+              enabled: true,
             },
-
-            // tooltip: {
-            //   custom:
-            // },
           }}
         />
       )}
