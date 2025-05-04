@@ -1,11 +1,11 @@
 {
   "files": {
-    "main.js": "/Crypto-app/static/js/main.451fb15d.js",
+    "main.js": "/Crypto-app/static/js/main.bc557515.js",
     "static/media/ImageCircleAi.svg": "/Crypto-app/static/media/ImageCircleAi.2c35464ddefa0d111a2b8388fc3e6975.svg",
     "index.html": "/Crypto-app/index.html",
-    "main.451fb15d.js.map": "/Crypto-app/static/js/main.451fb15d.js.map"
+    "main.bc557515.js.map": "/Crypto-app/static/js/main.bc557515.js.map"
   },
   "entrypoints": [
-    "static/js/main.451fb15d.js"
+    "static/js/main.bc557515.js"
   ]
 }
