@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { IPriceData } from "../api";
 
-const Wrapper = styled.div`
+const PriceWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -12,7 +12,7 @@ const Wrapper = styled.div`
     font-weight: 800;
   }
   span:last-child {
-    font-weight: 400;
+    font-weight: 500;
   }
 `;
 
@@ -23,29 +23,31 @@ interface PriceProps {
 function Price(data: PriceProps) {
   return (
     <>
-      <Wrapper>
-        <span>ATH Price</span>
-        <span>{`$ ${data.data.quotes.USD.ath_price.toFixed(3)}`}</span>
-      </Wrapper>
-      <Wrapper>
-        <span>Price</span>
-        <span>{`$ ${data.data.quotes.USD.price.toFixed(3)}`}</span>
-      </Wrapper>
-      <Wrapper>
-        <span>Percent Change 24H</span>
-        <span>{`${data.data.quotes.USD.percent_change_24h} %`}</span>
-      </Wrapper>
-      <Wrapper>
-        <span>Volume 24H</span>
+      <PriceWrapper>
+        <span>ATH Price(ATH Date)</span>
+        <span>{`$ ${data.data.quotes.USD.ath_price.toFixed(
+          3
+        )}(${data.data.quotes.USD.ath_date.slice(0, 10)})`}</span>
+      </PriceWrapper>
+      <PriceWrapper>
+        <span>Price(Change 24h)</span>
+        <span>{`$ ${data.data.quotes.USD.price.toFixed(3)}(${
+          data.data.quotes.USD.percent_change_24h
+        } %)`}</span>
+      </PriceWrapper>
+      <PriceWrapper>
+        <span>Volume(Change 24h)</span>
         <span>{`${data.data.quotes.USD.volume_24h.toLocaleString(undefined, {
           minimumFractionDigits: 3,
           maximumFractionDigits: 3,
-        })}`}</span>
-      </Wrapper>
-      <Wrapper>
-        <span>Market Cap</span>
-        <span>{`${data.data.quotes.USD.market_cap.toLocaleString()}`}</span>
-      </Wrapper>
+        })}(${data.data.quotes.USD.volume_24h_change_24h} %)`}</span>
+      </PriceWrapper>
+      <PriceWrapper>
+        <span>Market Cap(Change 24h)</span>
+        <span>{`${data.data.quotes.USD.market_cap.toLocaleString()}(${
+          data.data.quotes.USD.market_cap_change_24h
+        } %)`}</span>
+      </PriceWrapper>
     </>
   );
 }
