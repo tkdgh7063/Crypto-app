@@ -26,7 +26,7 @@ import {
   FaYoutube,
   FaBlog,
 } from "react-icons/fa";
-import { IErrorProps, IInfoData, IPriceData } from "../api";
+import { IError, IInfoData, IPriceData } from "../api";
 
 const Container = styled.div`
   padding: 0px 20px;
@@ -238,7 +238,9 @@ const linkIcons: Record<LinkCategory, IconType> = {
   medium: FaBlog,
 };
 
-const Error = styled.div``;
+const Error = styled.div`
+  text-align: center;
+`;
 
 function Coin() {
   const { coinId } = useParams<RouteParams>();
@@ -248,13 +250,18 @@ function Coin() {
   const chartMatch = useRouteMatch("/:coinId/chart");
 
   const { isLoading: infoLoading, data: infoData } = useQuery<
-    IInfoData | IErrorProps
+    IInfoData | IError
   >(["info", coinId], () => coinInfoFetcher(coinId));
   const { isLoading: tickersLoading, data: tickersData } = useQuery<IPriceData>(
     ["tickers", coinId],
     () => coinTickersFetcher(coinId),
     {
-      refetchInterval: 10000,
+      refetchInterval: (data) => {
+        if (data && "error" in data) {
+          return false;
+        }
+        return 10000;
+      },
     }
   );
 
@@ -266,13 +273,13 @@ function Coin() {
   const loading = infoLoading || tickersLoading;
   const history = useHistory();
 
-  if (!loading && infoData && tickersData) {
-    if ("error" in infoData || "error" in tickersData) {
-      const errorData = infoData as IErrorProps;
+  if (loading && infoData) {
+    if ("error" in infoData) {
+      const errorData = infoData as IError;
       return (
         <Container>
-          <Error>{errorData?.type}</Error>
-          <Description>Try again after {errorData?.block_duration}</Description>
+          <Error>{errorData?.error}</Error>
+          <Description>Try again 1 hour later</Description>
         </Container>
       );
     }

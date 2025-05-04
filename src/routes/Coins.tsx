@@ -3,7 +3,7 @@ import { useQuery } from "react-query";
 import { Link } from "react-router-dom";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
-import { ICoin, IErrorProps } from "../api";
+import { ICoin, IError } from "../api";
 import ImageCircleAi from "../assets/images/ImageCircleAi.svg";
 import { isDarkAtom } from "../atoms";
 import { coinsFetcher } from "./api";
@@ -12,6 +12,11 @@ const Container = styled.div`
   padding: 0px 20px;
   max-width: 480px;
   margin: 0 auto;
+`;
+
+const ErrorWrapper = styled.div`
+  display: block;
+  text-align: center;
 `;
 
 const Error = styled.div``;
@@ -76,8 +81,12 @@ const Coin = styled.li`
 
 interface ICoinsProps {}
 
+function isError(data: ICoin[] | IError): data is IError {
+  return "error" in data;
+}
+
 function Coins({}: ICoinsProps) {
-  const { isLoading, data } = useQuery<ICoin[] | IErrorProps>(
+  const { isLoading, data } = useQuery<ICoin[] | IError>(
     "allCoins",
     coinsFetcher
   );
@@ -91,14 +100,13 @@ function Coins({}: ICoinsProps) {
   };
 
   if (!isLoading && data) {
-    // Error Return
-    if ("error" in data) {
-      const errorData = data as IErrorProps;
+    if (isError(data)) {
+      const errorData = data as IError;
       return (
-        <Container>
-          <Error>{errorData?.type}</Error>
-          <Description>Try again after {errorData?.block_duration}</Description>
-        </Container>
+        <ErrorWrapper>
+          <Error>{errorData?.error}</Error>
+          <Description>Try again 1 hour later</Description>
+        </ErrorWrapper>
       );
     }
   }

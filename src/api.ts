@@ -114,3 +114,7 @@ export interface IHistorical {
 export interface IError {
   error: string;
 }
+
+export interface ChartError {
+  error: string;
+}

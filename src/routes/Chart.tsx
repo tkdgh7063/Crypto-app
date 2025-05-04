@@ -3,7 +3,7 @@ import { coinHistoryFetcher } from "./api";
 import ApexChart from "react-apexcharts";
 import { isDarkAtom } from "../atoms";
 import { useRecoilValue } from "recoil";
-import { IHistorical, IError } from "../api";
+import { IHistorical, ChartError } from "../api";
 import { styled } from "styled-components";
 
 interface ChartProps {
@@ -16,12 +16,12 @@ const ErrorContainer = styled.div`
   align-items: center;
 `;
 
-function isError(data: IHistorical[] | IError): data is IError {
+function isError(data: IHistorical[] | ChartError): data is ChartError {
   return "error" in data;
 }
 
 function Chart({ coinId }: ChartProps) {
-  const { isLoading, data } = useQuery<IHistorical[] | IError>(
+  const { isLoading, data } = useQuery<IHistorical[] | ChartError>(
     ["ohlcv", coinId],
     () => coinHistoryFetcher(coinId)
   );
