@@ -44,7 +44,7 @@ function Price(data: PriceProps) {
       </PriceWrapper>
       <PriceWrapper>
         <span>Market Cap(Change 24h)</span>
-        <span>{`${data.data.quotes.USD.market_cap.toLocaleString()}(${
+        <span>{`$ ${data.data.quotes.USD.market_cap.toLocaleString()}(${
           data.data.quotes.USD.market_cap_change_24h
         } %)`}</span>
       </PriceWrapper>
