@@ -6,7 +6,6 @@ import {
   useLocation,
   useParams,
   useRouteMatch,
-  useHistory,
 } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { styled } from "styled-components";
@@ -26,7 +25,7 @@ import {
   FaYoutube,
   FaBlog,
 } from "react-icons/fa";
-import { IError, IInfoData, IPriceData } from "../api";
+import { IErrorProps, IInfoData, IPriceData } from "../api";
 
 const Container = styled.div`
   padding: 0px 20px;
@@ -242,6 +241,19 @@ const Error = styled.div`
   text-align: center;
 `;
 
+function isError(data: IInfoData | IErrorProps): data is IErrorProps {
+  return "error" in data;
+}
+
+function getRetryMessage(duration: "1h" | "24h"): string {
+  switch (duration) {
+    case "1h":
+      return "Please try again after 1 hour.";
+    case "24h":
+      return "Please try again after 24 hours.";
+  }
+}
+
 function Coin() {
   const { coinId } = useParams<RouteParams>();
   const { state } = useLocation<RouteState>();
@@ -250,16 +262,16 @@ function Coin() {
   const chartMatch = useRouteMatch("/:coinId/chart");
 
   const { isLoading: infoLoading, data: infoData } = useQuery<
-    IInfoData | IError
+    IInfoData | IErrorProps
   >(["info", coinId], () => coinInfoFetcher(coinId));
   const { isLoading: tickersLoading, data: tickersData } = useQuery<
-    IPriceData | IError
+    IPriceData | IErrorProps
   >(["tickers", coinId], () => coinTickersFetcher(coinId), {
     refetchInterval: (data) => {
       if (data && "error" in data) {
         return false;
       }
-      return 10000;
+      return 1000 * 60;
     },
   });
 
@@ -269,16 +281,15 @@ function Coin() {
   const toggleTheme = () => setDarkAtom((prev) => !prev);
 
   const loading = infoLoading || tickersLoading;
-  const history = useHistory();
 
-  if ((loading && infoData) || tickersData) {
-    const ID = infoData as IError | IInfoData;
-    if ("error" in ID) {
-      const errorData = infoData as IError;
+  if (loading && infoData && tickersData) {
+    const ID = infoData as IErrorProps | IInfoData;
+    if (isError(ID)) {
+      const errorData = infoData as IErrorProps;
       return (
         <Container>
-          <Error>{errorData?.error}</Error>
-          <Description>Try again 1 hour later</Description>
+          <Error>Our service is temporarily limiting requests.</Error>
+          <Description>{getRetryMessage(errorData.block_duration)}</Description>
         </Container>
       );
     }

@@ -13,7 +13,7 @@ export interface IErrorProps {
   hard_limit: string;
   soft_limit: string;
   error: string;
-  block_duration: string;
+  block_duration: "1h" | "24h";
 }
 
 export interface IWhitepaper {

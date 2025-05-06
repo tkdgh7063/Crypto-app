@@ -3,7 +3,7 @@ import { useQuery } from "react-query";
 import { Link } from "react-router-dom";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
-import { ICoin, IError } from "../api";
+import { ICoin, IErrorProps } from "../api";
 import ImageCircleAi from "../assets/images/ImageCircleAi.svg";
 import { isDarkAtom } from "../atoms";
 import { coinsFetcher } from "./api";
@@ -81,12 +81,21 @@ const Coin = styled.li`
 
 interface ICoinsProps {}
 
-function isError(data: ICoin[] | IError): data is IError {
+function isError(data: ICoin[] | IErrorProps): data is IErrorProps {
   return "error" in data;
 }
 
+function getRetryMessage(duration: "1h" | "24h"): string {
+  switch (duration) {
+    case "1h":
+      return "Please try again after 1 hour.";
+    case "24h":
+      return "Please try again after 24 hours.";
+  }
+}
+
 function Coins({}: ICoinsProps) {
-  const { isLoading, data } = useQuery<ICoin[] | IError>(
+  const { isLoading, data } = useQuery<ICoin[] | IErrorProps>(
     "allCoins",
     coinsFetcher
   );
@@ -101,13 +110,17 @@ function Coins({}: ICoinsProps) {
 
   if (!isLoading && data) {
     if (isError(data)) {
-      const errorData = data as IError;
-      return (
-        <ErrorWrapper>
-          <Error>{errorData?.error}</Error>
-          <Description>Try again 1 hour later</Description>
-        </ErrorWrapper>
-      );
+      const errorData = data as IErrorProps;
+      if (errorData?.type === "payment_required") {
+        return (
+          <ErrorWrapper>
+            <Error>Our service is temporarily limiting requests.</Error>
+            <Description>
+              {getRetryMessage(errorData?.block_duration)}
+            </Description>
+          </ErrorWrapper>
+        );
+      }
     }
   }
 

@@ -1,25 +1,17 @@
 import {
   ICoin,
-  IErrorProps,
   IHistorical,
   IInfoData,
   IPriceData,
   ChartError,
-  IError,
+  IErrorProps,
 } from "../api";
 
-const BASE_URL = `https://api.coinpaprika.com/v1`;
+const BASE_URL = `https://crypto-proxy-server-hcxn.onrender.com`;
 
-export function coinsFetcher(): Promise<ICoin[] | IError> {
-  return fetch(`${BASE_URL}/coins`, {
-    method: "GET",
-    mode: "no-cors",
-    headers: { "Content-Type": "application-json" },
-  })
+export function coinsFetcher(): Promise<ICoin[] | IErrorProps> {
+  return fetch(`${BASE_URL}/coins`)
     .then((r) => {
-      if (r.status === 0) {
-        return { error: "API Error" };
-      }
       return r.json();
     })
     .catch((e) => {
@@ -27,16 +19,11 @@ export function coinsFetcher(): Promise<ICoin[] | IError> {
     });
 }
 
-export function coinInfoFetcher(coinId: String): Promise<IInfoData | IError> {
-  return fetch(`${BASE_URL}/coins/${coinId}`, {
-    method: "GET",
-    mode: "no-cors",
-    headers: { "Content-Type": "application-json" },
-  })
+export function coinInfoFetcher(
+  coinId: String
+): Promise<IInfoData | IErrorProps> {
+  return fetch(`${BASE_URL}/coins/${coinId}`)
     .then((r) => {
-      if (r.status === 0) {
-        return { error: "API Error" };
-      }
       return r.json();
     })
     .catch((e) => {
@@ -46,16 +33,9 @@ export function coinInfoFetcher(coinId: String): Promise<IInfoData | IError> {
 
 export function coinTickersFetcher(
   coinId: string
-): Promise<IPriceData | IError> {
-  return fetch(`${BASE_URL}/tickers/${coinId}`, {
-    method: "GET",
-    mode: "no-cors",
-    headers: { "Content-Type": "application-json" },
-  })
+): Promise<IPriceData | IErrorProps> {
+  return fetch(`${BASE_URL}/tickers/${coinId}`)
     .then((r) => {
-      if (r.status === 0) {
-        return { error: "API Error" };
-      }
       return r.json();
     })
     .catch((e) => {
