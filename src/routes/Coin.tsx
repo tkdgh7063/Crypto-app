@@ -25,7 +25,7 @@ import {
   FaYoutube,
   FaBlog,
 } from "react-icons/fa";
-import { IErrorProps, IInfoData, IPriceData } from "../api";
+import { IError, IErrorProps, IInfoData, IPriceData } from "../api";
 
 const Container = styled.div`
   padding: 0px 20px;
@@ -241,7 +241,11 @@ const Error = styled.div`
   text-align: center;
 `;
 
-function isError(data: IInfoData | IErrorProps): data is IErrorProps {
+function isError(data: IInfoData | IErrorProps | IError): data is IErrorProps {
+  return "soft_limit" in data;
+}
+
+function isAPIError(data: IInfoData | IError): data is IError {
   return "error" in data;
 }
 
@@ -262,10 +266,10 @@ function Coin() {
   const chartMatch = useRouteMatch("/:coinId/chart");
 
   const { isLoading: infoLoading, data: infoData } = useQuery<
-    IInfoData | IErrorProps
+    IInfoData | IErrorProps | IError
   >(["info", coinId], () => coinInfoFetcher(coinId));
   const { isLoading: tickersLoading, data: tickersData } = useQuery<
-    IPriceData | IErrorProps
+    IPriceData | IErrorProps | IError
   >(["tickers", coinId], () => coinTickersFetcher(coinId), {
     refetchInterval: (data) => {
       if (data && "error" in data) {
@@ -283,13 +287,20 @@ function Coin() {
   const loading = infoLoading || tickersLoading;
 
   if (loading && infoData && tickersData) {
-    const ID = infoData as IErrorProps | IInfoData;
+    const ID = infoData as IErrorProps | IInfoData | IError;
     if (isError(ID)) {
       const errorData = infoData as IErrorProps;
       return (
         <Container>
           <Error>Our service is temporarily limiting requests.</Error>
           <Description>{getRetryMessage(errorData.block_duration)}</Description>
+        </Container>
+      );
+    } else if (isAPIError(ID)) {
+      return (
+        <Container>
+          <Error>Oops! Something went wrong while loading the data.</Error>
+          <Description>Please give it another try soon.</Description>
         </Container>
       );
     }

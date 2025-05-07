@@ -3,7 +3,7 @@ import { useQuery } from "react-query";
 import { Link } from "react-router-dom";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
-import { ICoin, IErrorProps } from "../api";
+import { ICoin, IError, IErrorProps } from "../api";
 import ImageCircleAi from "../assets/images/ImageCircleAi.svg";
 import { isDarkAtom } from "../atoms";
 import { coinsFetcher } from "./api";
@@ -81,7 +81,9 @@ const Coin = styled.li`
 
 interface ICoinsProps {}
 
-function isError(data: ICoin[] | IErrorProps): data is IErrorProps {
+function isError(
+  data: ICoin[] | IErrorProps | IError
+): data is IErrorProps | IError {
   return "error" in data;
 }
 
@@ -95,7 +97,7 @@ function getRetryMessage(duration: "1h" | "24h"): string {
 }
 
 function Coins({}: ICoinsProps) {
-  const { isLoading, data } = useQuery<ICoin[] | IErrorProps>(
+  const { isLoading, data } = useQuery<ICoin[] | IErrorProps | IError>(
     "allCoins",
     coinsFetcher
   );

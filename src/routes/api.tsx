@@ -5,48 +5,47 @@ import {
   IPriceData,
   ChartError,
   IErrorProps,
+  IError,
 } from "../api";
 
 const BASE_URL = `https://crypto-proxy-server-hcxn.onrender.com`;
 
-export function coinsFetcher(): Promise<ICoin[] | IErrorProps> {
-  return fetch(`${BASE_URL}/coins`)
-    .then((r) => {
-      return r.json();
-    })
-    .catch((e) => {
-      return { error: "API Error" };
-    });
+export async function coinsFetcher(): Promise<ICoin[] | IErrorProps | IError> {
+  try {
+    const r = await fetch(`${BASE_URL}/coins`);
+    return await r.json();
+  } catch (e) {
+    return { error: "API Error" };
+  }
 }
 
-export function coinInfoFetcher(
+export async function coinInfoFetcher(
   coinId: String
-): Promise<IInfoData | IErrorProps> {
-  return fetch(`${BASE_URL}/coins/${coinId}`)
-    .then((r) => {
-      return r.json();
-    })
-    .catch((e) => {
-      return { error: "API Error" };
-    });
+): Promise<IInfoData | IErrorProps | IError> {
+  try {
+    const r = await fetch(`${BASE_URL}/coins/${coinId}`);
+    return await r.json();
+  } catch (e) {
+    return { error: "API Error" };
+  }
 }
 
-export function coinTickersFetcher(
+export async function coinTickersFetcher(
   coinId: string
-): Promise<IPriceData | IErrorProps> {
-  return fetch(`${BASE_URL}/tickers/${coinId}`)
-    .then((r) => {
-      return r.json();
-    })
-    .catch((e) => {
-      return { error: "API Error" };
-    });
+): Promise<IPriceData | IErrorProps | IError> {
+  try {
+    const r = await fetch(`${BASE_URL}/tickers/${coinId}`);
+    return await r.json();
+  } catch (e) {
+    return { error: "API Error" };
+  }
 }
 
-export function coinHistoryFetcher(
+export async function coinHistoryFetcher(
   coinId: string
-): Promise<IHistorical[] | ChartError> {
-  return fetch(
+): Promise<IHistorical[] | ChartError | IError> {
+  const r = await fetch(
     `https://ohlcv-api.nomadcoders.workers.dev/?coinId=${coinId}`
-  ).then((r) => r.json());
+  );
+  return await r.json();
 }
