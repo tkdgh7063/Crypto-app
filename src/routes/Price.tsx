@@ -21,6 +21,9 @@ interface PriceProps {
 }
 
 function Price(data: PriceProps) {
+  const direction =
+    data?.data.quotes.USD.percent_change_24h > 0 ? "red" : "blue";
+
   return (
     <>
       <PriceWrapper>
@@ -31,9 +34,10 @@ function Price(data: PriceProps) {
       </PriceWrapper>
       <PriceWrapper>
         <span>Price(Change 24h)</span>
-        <span>{`$ ${data.data.quotes.USD.price.toFixed(3)}(${
-          data.data.quotes.USD.percent_change_24h
-        } %)`}</span>
+        <span
+          style={{ color: direction }}>{`$ ${data.data.quotes.USD.price.toFixed(
+          3
+        )}(${data.data.quotes.USD.percent_change_24h} %)`}</span>
       </PriceWrapper>
       <PriceWrapper>
         <span>Volume(Change 24h)</span>
